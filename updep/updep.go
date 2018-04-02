@@ -1,5 +1,10 @@
 package updep
 
+import (
+	"errors"
+	"os"
+)
+
 var (
 	Languages       = make(map[string]Language)
 	PackageManagers = make(map[string]PackageManager)
@@ -17,6 +22,13 @@ type PackageManager struct {
 }
 
 func DetectPackageManagers(root string) ([]PackageManager, error) {
+	stat, err := os.Stat(root)
+	if err != nil {
+		return nil, err
+	}
+	if !stat.IsDir() {
+		return nil, errors.New("not a directory")
+	}
 	pms := make([]PackageManager, 0)
 	for _, pm := range PackageManagers {
 		if pm.CheckFn(root) {

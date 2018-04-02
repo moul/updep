@@ -32,8 +32,9 @@ var (
 
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Display project-wide updatermation",
+	Use:   "update DIR [DIR...]",
+	Short: "Update dependencies",
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		branchName := "updep-" + time.Now().Format("20060102-150405")
 		updateMessage := "chore: update dependencies (updep)"

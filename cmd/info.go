@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -26,34 +25,41 @@ import (
 
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
-	Use:   "info",
+	Use:   "info DIR [DIR...]",
 	Short: "Display project-wide information",
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			args = []string{"."}
-		}
-		found := false
+		maxlen := maxArgLength(args)
 		for _, workdir := range args {
+			workdirstr := fmt.Sprintf(fmt.Sprintf("%%-%ds", maxlen+1), fmt.Sprintf("%s:", workdir))
 			pms, err := updep.DetectPackageManagers(workdir)
 			if err != nil {
-				log.Fatal(err)
-			}
-			if len(pms) == 0 {
+				fmt.Printf("%s %v\n", workdirstr, err)
 				continue
 			}
-			found = true
+			if len(pms) == 0 {
+				fmt.Printf("%s unknown ecosystem\n", workdirstr)
+				continue
+			}
 			pmNames := []string{}
 			langNames := []string{}
 			for _, pm := range pms {
 				pmNames = append(pmNames, pm.Name)
 				langNames = append(langNames, pm.Language.Name)
 			}
-			fmt.Printf("%s: lang=%s, pm=%s\n", workdir, strings.Join(langNames, ","), strings.Join(pmNames, ", "))
-		}
-		if !found {
-			log.Fatalf("no ecosystem detected in %s", strings.Join(args, ", "))
+			fmt.Printf("%s lang=%s pm=%s\n", workdirstr, strings.Join(langNames, ","), strings.Join(pmNames, ", "))
 		}
 	},
+}
+
+func maxArgLength(args []string) int {
+	maxlen := 0
+	for _, arg := range args {
+		if newlen := len(arg); newlen > maxlen {
+			maxlen = newlen
+		}
+	}
+	return maxlen
 }
 
 func init() {
