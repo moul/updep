@@ -32,21 +32,30 @@ var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Display project-wide information",
 	Run: func(cmd *cobra.Command, args []string) {
-		pms, err := updep.DetectPackageManagers(workDir)
-		if err != nil {
-			log.Fatal(err)
+		if len(args) == 0 {
+			args = []string{"."}
 		}
-		if len(pms) == 0 {
-			log.Fatal(fmt.Errorf("no package manager detected in %s", workDir))
+		found := false
+		for _, workdir := range args {
+			pms, err := updep.DetectPackageManagers(workdir)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if len(pms) == 0 {
+				continue
+			}
+			found = true
+			pmNames := []string{}
+			langNames := []string{}
+			for _, pm := range pms {
+				pmNames = append(pmNames, pm.Name)
+				langNames = append(langNames, pm.Language.Name)
+			}
+			fmt.Printf("%s: lang=%s, pm=%s\n", workdir, strings.Join(langNames, ","), strings.Join(pmNames, ", "))
 		}
-		pmNames := []string{}
-		langNames := []string{}
-		for _, pm := range pms {
-			pmNames = append(pmNames, pm.Name)
-			langNames = append(langNames, pm.Language.Name)
+		if !found {
+			log.Fatalf("no ecosystem detected in %s", strings.Join(args, ", "))
 		}
-		fmt.Printf("Detected Languages:         %s\n", strings.Join(langNames, ", "))
-		fmt.Printf("Detected Package Managers:  %s\n", strings.Join(pmNames, ", "))
 	},
 }
 
