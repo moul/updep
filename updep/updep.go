@@ -14,9 +14,6 @@ type PackageManager struct {
 	Language     Language
 	CheckFn      func(string) bool
 	UpdateDepsFn func(string) error
-	InstallCmd   string
-	RestoreCmd   string
-	UpdateCmd    string
 }
 
 func DetectPackageManagers(root string) ([]PackageManager, error) {

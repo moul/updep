@@ -13,10 +13,6 @@ var PmGlide = PackageManager{
 		stat, err := os.Stat(path.Join(root, "glide.yaml"))
 		return err == nil && !stat.IsDir()
 	},
-	// VersionFn:
-	InstallCmd: "github.com/Masterminds/glide",
-	RestoreCmd: "glide install",
-	UpdateCmd:  "glide update",
 	UpdateDepsFn: func(workdir string) error {
 		cmd := exec.Command("glide", "update")
 		cmd.Dir = workdir

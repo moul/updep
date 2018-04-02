@@ -12,10 +12,6 @@ var PmGovendor = PackageManager{
 		stat, err := os.Stat(path.Join(root, "vendor", "vendor.json"))
 		return err == nil && !stat.IsDir()
 	},
-	// VersionFn:
-	InstallCmd: "github.com/kardianos/govendor",
-	RestoreCmd: "govendor sync",
-	UpdateCmd:  "govendor fetch",
 }
 
 func init() {

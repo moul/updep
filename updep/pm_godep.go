@@ -2,6 +2,7 @@ package updep
 
 import (
 	"os"
+	"os/exec"
 	"path"
 )
 
@@ -12,10 +13,14 @@ var PmGodep = PackageManager{
 		stat, err := os.Stat(path.Join(root, "Godeps", "Godeps.json"))
 		return err == nil && !stat.IsDir()
 	},
-	// VersionFn:
-	InstallCmd: "github.com/tools/godep",
-	RestoreCmd: "godep restore",
-	UpdateCmd:  "godep update",
+	UpdateDepsFn: func(workdir string) error {
+		cmd := exec.Command("godep", "update", "./...")
+		cmd.Dir = workdir
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stderr
+		cmd.Stderr = os.Stderr
+		return cmd.Run()
+	},
 }
 
 func init() {
