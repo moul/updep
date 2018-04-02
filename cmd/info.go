@@ -20,12 +20,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/moul/updep/updep"
 )
-
-var workDir string
 
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
@@ -61,6 +58,4 @@ var infoCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
-	infoCmd.Flags().StringVar(&workDir, "workdir", "", "Project directory")
-	viper.SetDefault("workdir", ".")
 }
