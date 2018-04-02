@@ -16,25 +16,42 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/moul/updep/updep"
 )
+
+var workDir string
 
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Display project-wide information",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("info called")
+		pms, err := updep.DetectPackageManagers(workDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(pms) == 0 {
+			log.Fatal(fmt.Errorf("no package manager detected in %s", workDir))
+		}
+		pmNames := []string{}
+		langNames := []string{}
+		for _, pm := range pms {
+			pmNames = append(pmNames, pm.Name)
+			langNames = append(langNames, pm.Language.Name)
+		}
+		fmt.Printf("Detected Languages:         %s\n", strings.Join(langNames, ", "))
+		fmt.Printf("Detected Package Managers:  %s\n", strings.Join(pmNames, ", "))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
+	infoCmd.Flags().StringVar(&workDir, "workdir", "", "Project directory")
+	viper.SetDefault("workdir", ".")
 }
